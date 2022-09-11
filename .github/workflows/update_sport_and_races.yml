@@ -1,0 +1,28 @@
+name: Scrape available markets and race meets
+
+# At 22:01UTC daily (08:01 Melbourne time).
+on:
+  schedule:
+    - cron: "1 22 * * *"
+
+jobs:
+  update-sports-and-meets:
+    runs-on: macOS-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: r-lib/actions/setup-r@master
+      - name: Package Installation
+        run: Rscript -e 'install.packages(c("dplyr", "httr", "tidyr", "jsonlite", "lubridate", "purrr"))'
+      - name: Update markets
+        run: Rscript -e 'source(file.path("R", "get_sports.R"), echo = TRUE)'
+      - name: Update race meets
+        run: Rscript -e 'source(file.path("R", "race-meets", "get_race_meets_incrememntal.R"), echo = TRUE)'
+      - name: Commit
+        run: |
+          git config --global user.name 'JaseZiv'
+          git config --global user.email 'jaseziv83@gmail.com'
+          git add .
+          git commit -m 'updating fotmob matches by date' || echo "No changes to commit"
+          git push || echo "No changes to commit"
