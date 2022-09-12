@@ -38,4 +38,6 @@ all_data <- tidyr::unnest(all_data,
 saveRDS(all_data, "data/sports_markets.rds")
 
 
+rm(list = ls())
+
 

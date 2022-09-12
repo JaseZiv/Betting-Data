@@ -108,6 +108,9 @@ for(i in dates) {
 }
 
 
-saveRDS(race_meets, "data/race_meets_21_22.rds")
+existing_df <- existing_df %>% dplyr::bind_rows(race_meets)
 
+saveRDS(existing_df, "data/race_meets_21_22.rds")
+
+rm(list = ls())
 
