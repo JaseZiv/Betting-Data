@@ -2,9 +2,9 @@ name: Scrape available markets and race meets
 
 # At 22:01UTC daily (08:01 Melbourne time).
 on:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
   schedule:
     - cron: "1 22 * * *"
 

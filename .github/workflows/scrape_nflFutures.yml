@@ -2,9 +2,9 @@ name: Scrape NFL Futures
 
 # At 23:01UTC daily (09:01 Melbourne time).
 on:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
   schedule:
     - cron: "1 23 * * *"
 

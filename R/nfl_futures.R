@@ -7,22 +7,20 @@ library(tidyr)
 
 # res <- GET("https://api.beta.tab.com.au/v1/tab-info-service/sports/American%20Football/competitions/NFL%20Futures?jurisdiction=VIC") %>% content()
 
-nfl_futures <- readRDS("data/nfl_futures.rds")
+nfl_futures <- readRDS(url("https://github.com/JaseZiv/Betting-Data/blob/main/data/nfl_futures.rds?raw=true"))
 
 scrape_date <- Sys.Date()
 
-sports <- readRDS("data/sports_markets.rds")
+sports <- readRDS(url("https://github.com/JaseZiv/Betting-Data/blob/main/data/sports_markets.rds?raw=true"))
 
 link_url <- sports %>%
   dplyr::filter(competitions.name == "NFL Futures") %>%
   dplyr::pull(self) %>% unlist()
 
-httr::set_config(httr::user_agent("RStudio Desktop (2022.7.1.554); R (4.1.1 x86_64-w64-mingw32 x86_64 mingw32)"))
-
 
 res <-  httr::GET(link_url) %>% httr::content()
 
-aa <- aa <- res$matches
+aa <- res$matches
 
 futures_markets <- data.frame()
 
@@ -30,7 +28,8 @@ for(j in 1:length(aa)) {
 
   markets <- aa[[j]]$markets %>% jsonlite::toJSON() %>% jsonlite::fromJSON() %>% data.frame()
   markets <- markets %>%
-    dplyr::rename(marketId=id, marketName=name, marketBettingStatus=bettingStatus, marketAllowPlace=allowPlace)
+    dplyr::rename(marketId=id, marketName=name, marketBettingStatus=bettingStatus, marketAllowPlace=allowPlace) %>%
+    dplyr::select(-message, -informationMessage)
 
   df <- tidyr::unnest(markets, cols = propositions) %>% data.frame()
 
@@ -38,6 +37,8 @@ for(j in 1:length(aa)) {
 
 }
 
+futures_markets <- futures_markets %>%
+  dplyr::select(-differential)
 
 futures_markets$scrape_date <- scrape_date
 
