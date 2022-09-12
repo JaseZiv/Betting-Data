@@ -18,6 +18,8 @@ library(purrr)
 
   each_url <- paste0('https://api.beta.tab.com.au/v1/historical-results-service/VIC/racing/', each_date)
 
+  httr::set_config(httr::user_agent("RStudio Desktop (2022.7.1.554); R (4.1.1 x86_64-w64-mingw32 x86_64 mingw32)"))
+
   history <- httr::RETRY("GET",
                          url = each_url,
                          times = 5, # the function has other params to tweak its behavior
@@ -35,6 +37,8 @@ library(purrr)
     stopifnot("The API is not accepting this request. Please try again." = iter <21)
 
     Sys.sleep(2)
+
+    httr::set_config(httr::user_agent("RStudio Desktop (2022.7.1.554); R (4.1.1 x86_64-w64-mingw32 x86_64 mingw32)"))
 
     history <- httr::RETRY("GET",
                            url = each_url,
