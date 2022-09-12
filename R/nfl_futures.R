@@ -9,6 +9,8 @@ library(tidyr)
 
 nfl_futures <- readRDS(url("https://github.com/JaseZiv/Betting-Data/blob/main/data/nfl_futures.rds?raw=true"))
 
+Sys.setenv(TZ = "Australia/Melbourne")
+
 scrape_date <- Sys.Date()
 
 sports <- readRDS(url("https://github.com/JaseZiv/Betting-Data/blob/main/data/sports_markets.rds?raw=true"))
@@ -52,3 +54,6 @@ futures_markets <- dplyr::bind_rows(futures_markets, nfl_futures)
 
 
 saveRDS(futures_markets, "data/nfl_futures.rds")
+
+
+rm(list = ls())
