@@ -1,7 +1,7 @@
 library(httr)
-library(rvest)
 library(lubridate)
-library(tidyverse)
+library(dplyr)
+library(purrr)
 
 
 .replace_empty_na <- function(val) {

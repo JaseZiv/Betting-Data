@@ -1,6 +1,7 @@
-require(httr)
+library(httr)
 library(jsonlite)
 library(dplyr)
+library(tidyr)
 
 
 params = list(

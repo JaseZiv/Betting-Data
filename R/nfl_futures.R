@@ -1,4 +1,7 @@
 library(dplyr)
+library(httr)
+library(jsonlite)
+library(tidyr)
 
 # NFL Futures -------------------------------------------------------------
 
