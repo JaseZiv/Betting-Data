@@ -8,7 +8,11 @@ params = list(
   `jurisdiction` = 'VIC'
 )
 
-httr::set_config(httr::user_agent("RStudio Desktop (2022.7.1.554); R (4.1.1 x86_64-w64-mingw32 x86_64 mingw32)"))
+httr::set_config(httr::use_proxy(url = Sys.getenv("PROXY_URL"),
+                                 port = as.numeric(Sys.getenv("PROXY_PORT")),
+                                 username =Sys.getenv("PROXY_USERNAME"),
+                                 password= Sys.getenv("PROXY_PASSWORD")))
+
 
 res <- httr::GET(url = 'https://api.beta.tab.com.au/v1/tab-info-service/sports', query = params)
 

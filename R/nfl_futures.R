@@ -18,6 +18,12 @@ link_url <- sports %>%
   dplyr::pull(self) %>% unlist()
 
 
+httr::set_config(httr::use_proxy(url = Sys.getenv("PROXY_URL"),
+                                 port = as.numeric(Sys.getenv("PROXY_PORT")),
+                                 username =Sys.getenv("PROXY_USERNAME"),
+                                 password= Sys.getenv("PROXY_PASSWORD")))
+
+
 res <-  httr::GET(link_url) %>% httr::content()
 
 aa <- res$matches
