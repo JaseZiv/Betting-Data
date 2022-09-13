@@ -31,5 +31,5 @@ jobs:
           git config --global user.name 'JaseZiv'
           git config --global user.email 'jaseziv83@gmail.com'
           git add .
-          git commit -m 'updating fotmob matches by date' || echo "No changes to commit"
+          git commit -m 'updating sports and race meets' || echo "No changes to commit"
           git push || echo "No changes to commit"
