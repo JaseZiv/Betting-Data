@@ -20,6 +20,8 @@ httr::set_config(httr::use_proxy(url = Sys.getenv("PROXY_URL"),
                                  password= Sys.getenv("PROXY_PASSWORD")))
 
 
+Sys.setenv(TZ = "Australia/Melbourne")
+
 
 .each_race_date <- function(each_date) {
 

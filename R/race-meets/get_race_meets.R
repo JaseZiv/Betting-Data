@@ -13,6 +13,7 @@ library(tidyverse)
 #   return(val)
 # }
 
+Sys.setenv(TZ = "Australia/Melbourne")
 
 .each_race_date <- function(each_date) {
 
