@@ -25,14 +25,14 @@ Sys.setenv(TZ = "Australia/Melbourne")
                          pause_min = 5,
                          pause_base = 2)
 
-  # print(httr::http_status(history)$message)
+  history_content <- suppressMessages(tryCatch(httr::content(history, "text"), error = function(e) NA_character_))
 
-  history <- history %>% content()
+  meetings_list <- tryCatch(data.frame(jsonlite::fromJSON(history_content)$meetings), error = function(e) NA_character_)
 
   # need a while loop here as there were still times when the API was failing and returning a list of length zero
   # have arbitrarily set the max number of retries in the while-loop to 20 - might want to parameterise this later
   iter <- 1
-  while(length(history) == 0) {
+  while(length(history_content) == 0 | is.na(history_content) | any(grepl("NOT_FOUND_ERROR", history_content))) {
 
     iter <- iter + 1
     stopifnot("The API is not accepting this request. Please try again." = iter <21)
@@ -45,30 +45,14 @@ Sys.setenv(TZ = "Australia/Melbourne")
                            pause_min = 5,
                            pause_base = 2)
 
-    history <- history %>% httr::content()
+
+    history_content <- suppressMessages(tryCatch(httr::content(history, "text"), error = function(e) NA_character_))
+
+    meetings_list <- tryCatch(data.frame(jsonlite::fromJSON(history_content)$meetings), error = function(e) NA_character_)
 
   }
 
-  # history <- httr::GET(url = paste0('https://api.beta.tab.com.au/v1/historical-results-service/VIC/racing/', each_date)) %>% content()
-  meetings_list <- history$meetings
-
-
-  .each_race_meet <- function(x) {
-    meta <- data.frame(meetingName = tryCatch(as.character(x[["meetingName"]]) %>% .replace_empty_na(), error = function(e) NA_character_),
-                       location = tryCatch(as.character(x[["location"]]) %>% .replace_empty_na(), error = function(e) NA_character_),
-                       venueMnemonic = tryCatch(as.character(x[["venueMnemonic"]]) %>% .replace_empty_na(), error = function(e) NA_character_),
-                       raceType = tryCatch(as.character(x[["raceType"]]) %>% .replace_empty_na(), error = function(e) NA_character_),
-                       meetingDate = tryCatch(as.character(x[["meetingDate"]]) %>% .replace_empty_na(), error = function(e) NA_character_),
-                       weatherCondition = tryCatch(as.character(x[["weatherCondition"]]) %>% .replace_empty_na(), error = function(e) NA_character_),
-                       trackCondition = tryCatch(as.character(x[["trackCondition"]]) %>% .replace_empty_na(), error = function(e) NA_character_),
-                       meetUrl = tryCatch(as.character(x[["_links"]][["self"]]) %>% .replace_empty_na(), error = function(e) NA_character_),
-                       numRaces = tryCatch(x$races %>% length() %>% .replace_empty_na(), error = function(e) NA_character_)
-)
-  }
-
-  dat <- meetings_list %>%
-    purrr::map_df(.each_race_meet)
-
+  return(meetings_list)
 }
 
 
@@ -96,6 +80,13 @@ for(i in dates) {
 }
 
 
-saveRDS(race_meets, "data/race_meets_21_22.rds")
+race_meets21 <- race_meets %>%
+  filter(grepl("2021-", meetingDate))
+
+saveRDS(race_meets21, "data/race-meets/2021/race_meets_meta_2021.rds")
 
 
+race_meets22 <- race_meets %>%
+  filter(grepl("2022-", meetingDate))
+
+saveRDS(race_meets22, "data/race-meets/2022/race_meets_meta_2022.rds")
