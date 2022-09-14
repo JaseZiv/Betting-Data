@@ -21,7 +21,9 @@ jobs:
       - uses: actions/checkout@v2
       - uses: r-lib/actions/setup-r@master
       - name: Package Installation
-        run: Rscript -e 'install.packages(c("dplyr", "httr", "xml2", "tidyr", "jsonlite", "lubridate", "purrr"))'
+        run: Rscript -e 'install.packages(c("remotes", "dplyr", "httr", "tidyr", "jsonlite", "lubridate"))'
+      - name: bettRtab Installation
+        run: Rscript -e 'remotes::install_github("JaseZiv/bettRtab")'
       - name: Update markets
         run: Rscript -e 'source(file.path("R", "get_sports.R"), echo = TRUE)'
       - name: Update race meets
