@@ -28,12 +28,41 @@ for(i in b) {
 }
 
 all_data <- all_data %>%
-  dplyr::select(-competitions.tournaments)
+  select(-X_links.self, -X_links.selfTemplate, -X_links.competitions, -X_links.footytab)
+## here, we want to do soemthing with the FALSE results - expand those out:
+which_to_change <- all_data$competitions.hasMarkets == TRUE
 
-all_data <- tidyr::unnest(all_data,
-                     cols = c(competitions.id, competitions.name, competitions.spectrumId,
-                              competitions._links, competitions.hasMarkets,
-                              competitions.sameGame))
+# idx <- grep(!which_to_change, which_to_change)
+to_change <- all_data[!which_to_change, ]
+# to_change <- .unlist_df_cols(to_change)
+
+
+to_change <- to_change %>%
+  select(id, name, displayName, spectrumId, competitions.tournaments, sameGame)
+
+to_change <- tidyr::unnest(to_change,
+                           cols = competitions.tournaments, names_sep = ".")
+
+names(to_change) <- gsub(".tournaments", "", names(to_change))
+
+
+to_change <- tidyr::unnest(to_change,
+                           cols = c(competitions.id, competitions.name, competitions.spectrumId,
+                                    competitions._links))
+
+
+
+no_change <- all_data[which_to_change, ]
+
+no_change <- no_change %>%
+  dplyr::select(-competitions.tournaments, -competitions.hasMarkets, -competitions.sameGame)
+
+no_change <- tidyr::unnest(no_change,
+                           cols = c(competitions.id, competitions.name, competitions.spectrumId,
+                                    competitions._links))
+
+all_data <- bind_rows(no_change, to_change)
+
 
 saveRDS(all_data, "data/sports_markets.rds")
 
