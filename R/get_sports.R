@@ -66,6 +66,12 @@ all_data <- bind_rows(no_change, to_change)
 
 saveRDS(all_data, "data/sports_markets.rds")
 
+all_data %>%
+  select(id, name, displayName, competitions.id, competitions.name) %>%
+  mutate(id = as.numeric(id),
+         competitions.id = as.numeric(competitions.id)) %>%
+  arrange(id, competitions.id) %>%
+  write.csv("data/sports_markets.csv", row.names = FALSE)
 
 rm(list = ls())
 
