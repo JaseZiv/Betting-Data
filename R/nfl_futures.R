@@ -8,7 +8,7 @@ Sys.setenv(TZ = "Australia/Melbourne")
 
 scrape_date <- Sys.Date()
 
-nfl_futures <- readRDS(url("https://github.com/JaseZiv/Betting-Data/blob/main/data/nfl_futures.rds?raw=true"))
+nfl_futures <- readRDS(file.path("data", "nfl_futures.rds"))
 
 httr::set_config(httr::use_proxy(url = Sys.getenv("PROXY_URL"),
                                  port = as.numeric(Sys.getenv("PROXY_PORT")),
