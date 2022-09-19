@@ -1,0 +1,178 @@
+---
+title: "Melbourne Racing Statistics"
+format: html
+editor: visual
+---
+
+
+```{r}
+library(bettRtab)
+library(tidyverse)
+library(lubridate)
+
+m_r_race_lists <- readRDS("analysis/racing-statistics/m_r_race_lists.rds")
+runners_m_r <- parse_runners(m_r_race_lists)
+
+# because the initial scrape included Cranbourne to test for errors
+runners_m_r <- runners_m_r %>% 
+  filter(meetingName != "CRANBOURNE")
+```
+
+
+Because we're going to be largely analysing the win markets, want to to some summary stats on the parimutuel (tote) and fixed odds winning market.
+
+Interestingly, both the tote (`r sum(runners_m_r$parimutuel.returnWin == 0)`) and fixed markets (`r sum(runners_m_r$fixedOdds.returnWin == 0, na.rm=T)`) have zeros, while there are almost 1,700 horses that had a missing fixed odds win price.
+
+```{r}
+summary(runners_m_r$parimutuel.returnWin)
+
+
+summary(runners_m_r$fixedOdds.returnWin)
+```
+
+
+Looking at whether the horse ran gives us some info on these missing records.
+
+When looking at the fixed odds status, the result is `NA`.. we can then use the tote status to get some more info and the bulk of these appeared to have run (`Normal`). We can infer from this that there were some races that didn't have a fixed odds market. From this little analysis, I will remove scratched runners from here on in, but importantly, will keep late scratchings in (might need this info for further analysis). Reasoning behind this is that scratching normally occur well in advance of the race, while late scratchings can happen throughout a race meet, even after exotics have started - quaddies, etc.
+
+```{r}
+runners_m_r %>% 
+  filter(is.na(fixedOdds.returnWin)) %>% 
+  count(fixedOdds.bettingStatus)
+
+runners_m_r %>% 
+  filter(is.na(fixedOdds.returnWin)) %>% 
+  count(parimutuel.bettingStatus)
+
+runners_m_r %>% 
+  count(fixedOdds.bettingStatus, parimutuel.bettingStatus)
+```
+
+
+```{r}
+runners_m_r <- runners_m_r %>% 
+  filter(parimutuel.bettingStatus != "Scratched")
+```
+
+
+There are now `r sum(runners_m_r$parimutuel.returnWin == 0)` runners on the tote with a price of \$0, while there are `r sum(runners_m_r$fixedOdds.returnWin == 0, na.rm=T)` on fixed odds. We can substitue the missing tote values with the fixed odds win price, however there are `r runners_m_r %>% filter(parimutuel.returnWin == 0, is.na(fixedOdds.returnWin)) %>% nrow()` reords where a $0 tote figure is missing in the fixed odds market all together. These are for late scratchings. Will remove these also, and for the rest, replace the tote with the fixed odds price. Will create a column called `treat_tote_care` to identify these.
+
+```{r}
+runners_m_r %>% 
+  filter(parimutuel.returnWin == 0) %>% nrow()
+
+runners_m_r %>% 
+  filter(fixedOdds.returnWin == 0) %>% nrow()
+```
+
+
+```{r}
+runners_m_r <- runners_m_r %>% 
+  mutate(filter_out = case_when(
+    parimutuel.returnWin == 0 & is.na(fixedOdds.returnWin) ~ "Y",
+    TRUE ~ "N"
+  )) %>% filter(filter_out == "N") %>% select(-filter_out) %>% 
+  mutate(treat_tote_care = case_when(
+    parimutuel.returnWin == 0 & fixedOdds.returnWin != 0 ~ "Y",
+    TRUE ~ "N"
+  )) %>% 
+  mutate(parimutuel.returnWin = case_when(
+    parimutuel.returnWin == 0 ~ fixedOdds.returnWin,
+    TRUE ~ parimutuel.returnWin
+  ))
+
+```
+
+Might also need to do this the other way for the fixed odds prices that are missing. Will call this `treat_fixed_odds_care`.
+
+```{r}
+runners_m_r <- runners_m_r %>% 
+  mutate(treat_fixed_odds_care = case_when(
+    is.na(fixedOdds.returnWin) ~ "Y",
+    TRUE ~ "N"
+  )) %>% 
+  mutate(fixedOdds.returnWin = case_when(
+    treat_fixed_odds_care == "Y" ~ parimutuel.returnWin,
+    TRUE ~ fixedOdds.returnWin
+  ))
+
+runners_m_r %>% filter(parimutuel.returnWin == 0, is.na(fixedOdds.returnWin)) %>% nrow()
+```
+
+
+```{r}
+runners_m_r %>% 
+  filter(treat_fixed_odds_care == "N",
+         treat_tote_care == "N") %>% 
+  ggplot(aes(x=parimutuel.returnWin, y= fixedOdds.returnWin)) +
+  geom_point()
+
+
+lm_data <- runners_m_r %>% 
+  filter(treat_fixed_odds_care == "N",
+         treat_tote_care == "N")
+
+fit_lm <- lm(parimutuel.returnWin ~ fixedOdds.returnWin, data = lm_data)
+summary(fit_lm)
+
+```
+
+
+
+```{r}
+runners_m_r %>% 
+  ggplot(aes(x= parimutuel.returnWin, y= as.character(finishingPosition))) +
+  geom_boxplot() +
+  xlim(0, 100)
+
+
+runners_m_r %>% 
+  filter(finishingPosition == 1) %>%
+  ggplot() +
+  geom_density(aes(x= parimutuel.returnWin), colour = "red") +
+  geom_density(aes(x= fixedOdds.returnWin), colour = "blue")
+
+
+runners_m_r %>% 
+  filter(finishingPosition == 1,
+         treat_fixed_odds_care == "N") %>% pull(fixedOdds.returnWin) %>% summary()
+
+
+runners_m_r %>% 
+  filter(finishingPosition == 1,
+         treat_tote_care == "N") %>% pull(parimutuel.returnWin) %>% summary()
+
+
+group_summary <- function(data, group, x) {
+  data %>%                               # Summary by group using dplyr
+  group_by({{group}}) %>% 
+  summarize(min = min({{x}}),
+            q1 = quantile({{x}}, 0.25),
+            median = median({{x}}),
+            mean = mean({{x}}),
+            q3 = quantile({{x}}, 0.75),
+            max = max({{x}}))
+}
+
+group_summary(runners_m_r %>% filter(finishingPosition == 1), meetingName, parimutuel.returnWin)
+
+data %>%                               # Summary by group using dplyr
+  group_by(group) %>% 
+  summarize(min = min(x),
+            q1 = quantile(x, 0.25),
+            median = median(x),
+            mean = mean(x),
+            q3 = quantile(x, 0.75),
+            max = max(x))
+
+
+
+
+```
+
+
+
+
+
+
+

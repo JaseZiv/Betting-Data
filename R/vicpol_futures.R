@@ -8,7 +8,7 @@ Sys.setenv(TZ = "Australia/Melbourne")
 
 scrape_date <- Sys.time()
 
-vic_pol_futures <- readRDS(url("https://github.com/JaseZiv/Betting-Data/blob/main/data/vic_pol_futures.rds?raw=true"))
+vic_pol_futures <- readRDS(file.path("data", "vic_pol_futures.rds"))
 
 httr::set_config(httr::use_proxy(url = Sys.getenv("PROXY_URL"),
                                  port = as.numeric(Sys.getenv("PROXY_PORT")),
