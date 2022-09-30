@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Melbourne Racing Statistics</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="melb_racing_files/libs/clipboard/clipboard.min.js"></script>
+<script src="melb_racing_files/libs/quarto-html/quarto.js"></script>
+<script src="melb_racing_files/libs/quarto-html/popper.min.js"></script>
+<script src="melb_racing_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="melb_racing_files/libs/quarto-html/anchor.min.js"></script>
+<link href="melb_racing_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="melb_racing_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="melb_racing_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="melb_racing_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="melb_racing_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Melbourne Racing Statistics</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    
+  </div>
+  
+
+</header>
+
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(bettRtab)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔ ggplot2 3.3.6     ✔ purrr   0.3.4
+✔ tibble  3.1.7     ✔ dplyr   1.0.9
+✔ tidyr   1.2.0     ✔ stringr 1.4.0
+✔ readr   2.1.2     ✔ forcats 0.5.1</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'lubridate'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    date, intersect, setdiff, union</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'scales'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:purrr':
+
+    discard</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:readr':
+
+    col_factor</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>here() starts at /Users/zivkovij/Documents/Jason/Betting-Data</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>m_r_race_lists <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">here</span>(<span class="st">"analysis"</span>, <span class="st">"racing-statistics"</span>, <span class="st">"m_r_race_lists.rds"</span>))</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>runners_m_r <span class="ot">&lt;-</span> <span class="fu">parse_runners</span>(m_r_race_lists)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># because the initial scrape included Cranbourne to test for errors</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>runners_m_r <span class="ot">&lt;-</span> runners_m_r <span class="sc">%&gt;%</span> </span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(meetingName <span class="sc">!=</span> <span class="st">"CRANBOURNE"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Data was collected for the tracks listed below for all horse racing events in 2021 and 2022 (up to 2022-09-18).</p>
+<ul>
+<li>Caulfield</li>
+<li>Flemington</li>
+<li>Moonee Valley</li>
+<li>Sandown</li>
+</ul>
+<p>There were 1526 individual races analysed over this time frame.</p>
+<section id="what-are-we-analysing" class="level2">
+<h2 class="anchored" data-anchor-id="what-are-we-analysing">What are we analysing?</h2>
+<p>Because we’re going to be largely analysing the win markets, want to analyse some summary stats on the parimutuel (tote) and fixed odds winning market.</p>
+</section>
+<section id="what-questions-do-we-wat-to-answer" class="level2">
+<h2 class="anchored" data-anchor-id="what-questions-do-we-wat-to-answer">What questions do we wat to answer?</h2>
+<ol type="1">
+<li>What price do winners pay?</li>
+<li>Do favourites always win?</li>
+</ol>
+<ol type="a">
+<li>and if there is two clear favourites and then roughies, how often do the favs win?</li>
+</ol>
+<ol start="3" type="1">
+<li>Is there a difference between track? Weather? Race class? Number of runners, etc?</li>
+<li>Is there a way to optimise a quaddie structure - ie if taking field in one leg, and one or two in another, is there an optimal strategy to employ when to take the field or one-out?</li>
+</ol>
+<p>Interestingly, both the tote (4354) and fixed markets (123) have zeros, while there are almost 1,700 horses that had a missing fixed odds win price.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(runners_m_r<span class="sc">$</span>parimutuel.returnWin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   0.00    2.30    8.50   18.28   21.00  356.10 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(runners_m_r<span class="sc">$</span>fixedOdds.returnWin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+   0.00    6.00   12.00   22.56   26.00  251.00    1704 </code></pre>
+</div>
+</div>
+<p>Looking at whether the horse ran gives us some info on these missing records.</p>
+<p>When looking at the fixed odds status, the result is <code>NA</code>.. we can then use the tote status to get some more info and the bulk of these appeared to have run (<code>Normal</code>). We can infer from this that there were some races that didn’t have a fixed odds market. From this little analysis, I will remove scratched runners from here on in, but importantly, will keep late scratchings in (might need this info for further analysis). Reasoning behind this is that scratching normally occur well in advance of the race, while late scratchings can happen throughout a race meet, even after exotics have started - quaddies, etc.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>runners_m_r <span class="sc">%&gt;%</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(fixedOdds.returnWin)) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(fixedOdds.bettingStatus)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  fixedOdds.bettingStatus    n
+1                    &lt;NA&gt; 1704</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>runners_m_r <span class="sc">%&gt;%</span> </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(fixedOdds.returnWin)) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(parimutuel.bettingStatus)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  parimutuel.bettingStatus    n
+1            LateScratched   17
+2                   Normal 1399
+3                Scratched  288</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>runners_m_r <span class="sc">%&gt;%</span> </span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(fixedOdds.bettingStatus, parimutuel.bettingStatus)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  fixedOdds.bettingStatus parimutuel.bettingStatus     n
+1           LateScratched            LateScratched   224
+2           LateScratched                Scratched  3035
+3                   Loser                   Normal 10095
+4                    Open                Scratched    17
+5                 Placing                   Normal  2587
+6                  Winner                   Normal  1407
+7                    &lt;NA&gt;            LateScratched    17
+8                    &lt;NA&gt;                   Normal  1399
+9                    &lt;NA&gt;                Scratched   288</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>runners_m_r <span class="ot">&lt;-</span> runners_m_r <span class="sc">%&gt;%</span> </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(parimutuel.bettingStatus <span class="sc">!=</span> <span class="st">"Scratched"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>There are now 1014 runners on the tote with a price of $0, while there are 0 on fixed odds. We can substitue the missing tote values with the fixed odds win price, however there are 17 reords where a $0 tote figure is missing in the fixed odds market all together. These are for late scratchings. Will remove these also, and for the rest, replace the tote with the fixed odds price. Will create a column called <code>treat_tote_care</code> to identify these.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>runners_m_r <span class="sc">%&gt;%</span> </span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(parimutuel.returnWin <span class="sc">==</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> <span class="fu">nrow</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1014</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>runners_m_r <span class="sc">%&gt;%</span> </span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(fixedOdds.returnWin <span class="sc">==</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> <span class="fu">nrow</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>runners_m_r <span class="ot">&lt;-</span> runners_m_r <span class="sc">%&gt;%</span> </span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">filter_out =</span> <span class="fu">case_when</span>(</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    parimutuel.returnWin <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;</span> <span class="fu">is.na</span>(fixedOdds.returnWin) <span class="sc">~</span> <span class="st">"Y"</span>,</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"N"</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span> <span class="fu">filter</span>(filter_out <span class="sc">==</span> <span class="st">"N"</span>) <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>filter_out) <span class="sc">%&gt;%</span> </span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">treat_tote_care =</span> <span class="fu">case_when</span>(</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    parimutuel.returnWin <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;</span> fixedOdds.returnWin <span class="sc">!=</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">"Y"</span>,</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"N"</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span> </span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">parimutuel.returnWin =</span> <span class="fu">case_when</span>(</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>    parimutuel.returnWin <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> fixedOdds.returnWin,</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> parimutuel.returnWin</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>  ))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Might also need to do this the other way for the fixed odds prices that are missing. Will call this <code>treat_fixed_odds_care</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>runners_m_r <span class="ot">&lt;-</span> runners_m_r <span class="sc">%&gt;%</span> </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">treat_fixed_odds_care =</span> <span class="fu">case_when</span>(</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">is.na</span>(fixedOdds.returnWin) <span class="sc">~</span> <span class="st">"Y"</span>,</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"N"</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span> </span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">fixedOdds.returnWin =</span> <span class="fu">case_when</span>(</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    treat_fixed_odds_care <span class="sc">==</span> <span class="st">"Y"</span> <span class="sc">~</span> parimutuel.returnWin,</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> fixedOdds.returnWin</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>runners_m_r <span class="sc">%&gt;%</span> <span class="fu">filter</span>(parimutuel.returnWin <span class="sc">==</span> <span class="dv">0</span>, <span class="fu">is.na</span>(fixedOdds.returnWin)) <span class="sc">%&gt;%</span> <span class="fu">nrow</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0</code></pre>
+</div>
+</div>
+<section id="winners" class="level3">
+<h3 class="anchored" data-anchor-id="winners">Winners</h3>
+<p>Winners generally the lowest odds, not much difference between 2nd and 3rd, then increase in price</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>runners_m_r <span class="sc">%&gt;%</span> </span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span> parimutuel.returnWin, <span class="at">y=</span> <span class="fu">as.character</span>(finishingPosition))) <span class="sc">+</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="dv">0</span>, <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 627 rows containing non-finite values (stat_boxplot).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="melb_racing_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>runners_m_r <span class="sc">%&gt;%</span> </span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span> parimutuel.returnWin, <span class="at">y=</span> <span class="fu">as.character</span>(finishingPosition))) <span class="sc">+</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="dv">0</span>, <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 627 rows containing missing values (geom_point).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="melb_racing_files/figure-html/unnamed-chunk-8-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># runners_m_r %&gt;% </span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(finishingPosition == 1,</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="co">#          treat_fixed_odds_care == "N") %&gt;% </span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   ggplot(aes(x=fixedOdds.returnWin)) +</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_density()</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>runners_m_r <span class="sc">%&gt;%</span> </span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(finishingPosition <span class="sc">==</span> <span class="dv">1</span>,</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>         treat_fixed_odds_care <span class="sc">==</span> <span class="st">"N"</span>) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(fixedOdds.returnWin) <span class="sc">%&gt;%</span> <span class="fu">summary</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  1.120   3.300   5.000   8.185   9.500 251.000 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>runners_m_r <span class="sc">%&gt;%</span> </span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(finishingPosition <span class="sc">==</span> <span class="dv">1</span>,</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>         treat_tote_care <span class="sc">==</span> <span class="st">"N"</span>) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(parimutuel.returnWin) <span class="sc">%&gt;%</span> <span class="fu">summary</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  1.100   3.100   5.200   8.475   9.700 139.500 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>group_summary <span class="ot">&lt;-</span> <span class="cf">function</span>(data, ..., x) {</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  data <span class="sc">%&gt;%</span>                               <span class="co"># Summary by group using dplyr</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(...) <span class="sc">%&gt;%</span> </span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">n_races =</span> <span class="fu">n</span>(),</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">min =</span> <span class="fu">min</span>({{x}}),</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">q1 =</span> <span class="fu">quantile</span>({{x}}, <span class="fl">0.25</span>),</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">median =</span> <span class="fu">median</span>({{x}}),</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean =</span> <span class="fu">mean</span>({{x}}),</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">q3 =</span> <span class="fu">quantile</span>({{x}}, <span class="fl">0.75</span>),</span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">max =</span> <span class="fu">max</span>({{x}}))</span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a><span class="fu">group_summary</span>(runners_m_r <span class="sc">%&gt;%</span> <span class="fu">filter</span>(finishingPosition <span class="sc">==</span> <span class="dv">1</span>), <span class="at">group=</span>meetingName, <span class="at">x=</span>parimutuel.returnWin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 8
+  group         n_races   min    q1 median  mean    q3   max
+  &lt;chr&gt;           &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1 CAULFIELD         354   1.2  3.1    5.5   7.94  9.6   70.5
+2 FLEMINGTON        360   1.1  3.38   5.3   9.88  9.93 140. 
+3 MOONEE VALLEY     280   1.1  3.2    5.25  8.49 10.6   40.6
+4 SANDOWN           534   1.1  3      4.7   7.61  8.9   63.4</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">group_summary</span>(<span class="at">data=</span>runners_m_r <span class="sc">%&gt;%</span> <span class="fu">filter</span>(finishingPosition <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">is_group_race =</span> <span class="fu">str_detect</span>(raceClassConditions, <span class="st">"GP"</span>)), <span class="at">group=</span>meetingName, is_group_race, <span class="at">x=</span>parimutuel.returnWin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'group'. You can override using the
+`.groups` argument.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 7 × 9
+# Groups:   group [4]
+  group         is_group_race n_races   min    q1 median  mean    q3   max
+  &lt;chr&gt;         &lt;lgl&gt;           &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1 CAULFIELD     FALSE             339   1.2  3.1     5.5  7.84   9.5  70.5
+2 CAULFIELD     TRUE               15   2.3  3.35    6   10.2   14.2  31.8
+3 FLEMINGTON    FALSE             349   1.1  3.3     5.3  9.59   9.9 125. 
+4 FLEMINGTON    TRUE               11   1.8  3.7     7.3 19.2   12.8 140. 
+5 MOONEE VALLEY FALSE             275   1.1  3.2     5.2  8.53  10.8  40.6
+6 MOONEE VALLEY TRUE                5   2.1  3.3     6.6  6.34   9.1  10.6
+7 SANDOWN       FALSE             534   1.1  3       4.7  7.61   8.9  63.4</code></pre>
+</div>
+</div>
+</section>
+<section id="favourites" class="level3">
+<h3 class="anchored" data-anchor-id="favourites">Favourites</h3>
+<p>Now we want to do some analysis on favourites</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># select $2.8 as the heavy fav - it's the 5th percentile. Can change this if needed</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>heavy_fav_cutoff <span class="ot">&lt;-</span> <span class="fu">quantile</span>(runners_m_r<span class="sc">$</span>parimutuel.returnWin, <span class="at">probs =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="fl">0.05</span>))[<span class="st">"5%"</span>] <span class="sc">%&gt;%</span> <span class="fu">unname</span>()</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> runners_m_r <span class="sc">%&gt;%</span> </span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(meetingDate, meetingName, raceNumber, raceName, parimutuel.returnWin) <span class="sc">%&gt;%</span> </span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(meetingDate, meetingName, raceNumber, raceName) <span class="sc">%&gt;%</span> </span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">betting_rank =</span> <span class="fu">row_number</span>()) <span class="sc">%&gt;%</span> <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">heavy_fav =</span> <span class="fu">case_when</span>(</span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>    betting_rank <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> parimutuel.returnWin <span class="sc">&lt;=</span> heavy_fav_cutoff <span class="sc">~</span> <span class="st">"Y"</span>,</span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>    betting_rank <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> parimutuel.returnWin <span class="sc">&gt;</span> heavy_fav_cutoff <span class="sc">~</span> <span class="st">"N"</span>,</span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"Non Fav"</span></span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a>  ))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>How often did the favourite win?</p>
+<p>Slight variation between tracks, but fav generally wins about 30-35% of the time. At the Valley, they win the least frequently.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>test <span class="sc">%&gt;%</span> </span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(betting_rank <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">finishingPosition =</span> <span class="fu">factor</span>(finishingPosition, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">0</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(meetingName, finishingPosition) <span class="sc">%&gt;%</span> </span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="st">`</span><span class="at">Num Wins</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">Num Races</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">Num Wins</span><span class="st">`</span>),</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Win %</span><span class="st">`</span><span class="ot">=</span><span class="st">`</span><span class="at">Num Wins</span><span class="st">`</span> <span class="sc">/</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">Num Wins</span><span class="st">`</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(finishingPosition <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>finishingPosition) <span class="sc">%&gt;%</span> </span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">Win %</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">percent</span>(<span class="st">`</span><span class="at">Win %</span><span class="st">`</span>, <span class="at">accuracy =</span> <span class="fl">0.1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'meetingName'. You can override using the
+`.groups` argument.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 4
+# Groups:   meetingName [4]
+  meetingName   `Num Wins` `Num Races` `Win %`
+  &lt;chr&gt;              &lt;int&gt;       &lt;int&gt; &lt;chr&gt;  
+1 CAULFIELD            121         352 34.4%  
+2 FLEMINGTON           126         360 35.0%  
+3 MOONEE VALLEY         82         280 29.3%  
+4 SANDOWN              179         534 33.5%  </code></pre>
+</div>
+</div>
+<p>What about when there’s a heavy fav?</p>
+<p>There was a heavy fav (in this case any horse paying $2.80 or less), 734 of 1526 races.</p>
+<p>In these 734 races, the win rate of the fav jumped to between 36% and 45%.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>test <span class="sc">%&gt;%</span> </span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(heavy_fav <span class="sc">==</span> <span class="st">"Y"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">finishingPosition =</span> <span class="fu">factor</span>(finishingPosition, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">0</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(meetingName, finishingPosition) <span class="sc">%&gt;%</span> </span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="st">`</span><span class="at">Num Wins</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">Num Races</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">Num Wins</span><span class="st">`</span>),</span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Win %</span><span class="st">`</span><span class="ot">=</span><span class="st">`</span><span class="at">Num Wins</span><span class="st">`</span> <span class="sc">/</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">Num Wins</span><span class="st">`</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(finishingPosition <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>finishingPosition) <span class="sc">%&gt;%</span> </span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">Win %</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">percent</span>(<span class="st">`</span><span class="at">Win %</span><span class="st">`</span>, <span class="at">accuracy =</span> <span class="fl">0.1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'meetingName'. You can override using the
+`.groups` argument.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 4
+# Groups:   meetingName [4]
+  meetingName   `Num Wins` `Num Races` `Win %`
+  &lt;chr&gt;              &lt;int&gt;       &lt;int&gt; &lt;chr&gt;  
+1 CAULFIELD             78         174 44.8%  
+2 FLEMINGTON            59         143 41.3%  
+3 MOONEE VALLEY         55         151 36.4%  
+4 SANDOWN              112         266 42.1%  </code></pre>
+</div>
+</div>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

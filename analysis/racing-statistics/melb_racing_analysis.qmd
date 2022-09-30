@@ -1,0 +1,610 @@
+---
+title: "Melbourne Racing Statistics"
+format:
+    html:
+      theme: cosmo
+      fontsize: 1.1em
+      linestretch: 1.7
+      code-fold: true
+      code-summary: "Show the code"
+      self-contained: true
+editor: visual
+---
+
+```{r, warning=FALSE, message=FALSE}
+library(bettRtab)
+library(tidyverse)
+library(lubridate)
+library(scales)
+library(gt)
+library(here)
+
+m_r_race_lists <- readRDS(here("analysis", "racing-statistics", "m_r_race_lists.rds"))
+runners_m_r <- parse_runners(m_r_race_lists)
+
+# races21 <- bettRtab::load_race_meet_meta(cal_year = 2021)
+# races22 <- bettRtab::load_race_meet_meta(cal_year = 2022)
+# 
+# race_meta <- bind_rows(races21, races22)
+# saveRDS(race_meta, here("analysis", "racing-statistics", "race_meta.rds"))
+
+race_meta <- readRDS(here("analysis", "racing-statistics", "race_meta.rds"))
+
+race_meta <- race_meta %>% 
+  filter(meetingName %in% c("SANDOWN", "CAULFIELD", "FLEMINGTON", "MOONEE VALLEY")) %>% 
+  select(meetingDate, meetingName, weatherCondition, trackCondition) 
+  
+
+
+# because the initial scrape included Cranbourne to test for errors
+runners_m_r <- runners_m_r %>% 
+  filter(meetingName != "CRANBOURNE") %>% 
+  left_join(race_meta, by = c("meetingDate", "meetingName")) %>% 
+  mutate(is_group_race = str_detect(raceClassConditions, "GP"))
+```
+
+Data was collected for the tracks listed below for all horse racing events in 2021 and 2022 (up to `r max(runners_m_r$meetingDate, na.rm=T)`).
+
+-   Caulfield
+-   Flemington
+-   Moonee Valley
+-   Sandown
+
+There were `r runners_m_r %>% distinct(meetingName, meetingDate, raceNumber, raceName) %>% nrow()` individual races analysed over this time frame.
+
+## What are we analysing?
+
+Because we're going to be largely analysing the win markets, want to analyse some summary stats on the parimutuel (tote) and fixed odds winning market.
+
+## What questions do we want to answer?
+
+1.  What price do winners pay?
+2.  Do favourites always win?
+
+```{=html}
+<!-- -->
+```
+a.  and if there is two clear favourites and then roughies, how often do the favs win?
+
+```{=html}
+<!-- -->
+```
+3.  Is there a difference between track? Weather? Race class? Number of runners, etc?
+4.  Is there a way to optimise a quaddie structure - ie if taking field in one leg, and one or two in another, is there an optimal strategy to employ when to take the field or one-out?
+
+Interestingly, both the tote (`r sum(runners_m_r$parimutuel.returnWin == 0)`) and fixed markets (`r sum(runners_m_r$fixedOdds.returnWin == 0, na.rm=T)`) have zeros, while there were `r sum(is.na(runners_m_r$fixedOdds.returnWin))` horses that had a missing fixed odds win price.
+
+```{r, include=FALSE, echo=FALSE}
+summary(runners_m_r$parimutuel.returnWin)
+
+
+summary(runners_m_r$fixedOdds.returnWin)
+```
+
+Looking at whether the horse ran gives us some info on these missing records.
+
+When looking at the fixed odds status, the result is `NA` (missing).. we can then use the tote status to get some more info and the bulk of these appeared to have run (`Normal`). We can infer from this that there were some races that didn't have a fixed odds market. From this little analysis, I will remove scratched runners from here on in, but importantly, will keep late scratchings in (might need this info for further analysis). Reasoning behind this is that scratching normally occur well in advance of the race, while late scratchings can happen throughout a race meet, even after exotics have started - quaddies, etc.
+
+```{r, include=FALSE, echo=FALSE}
+runners_m_r %>% 
+  filter(is.na(fixedOdds.returnWin)) %>% 
+  count(fixedOdds.bettingStatus)
+
+runners_m_r %>% 
+  filter(is.na(fixedOdds.returnWin)) %>% 
+  count(parimutuel.bettingStatus)
+
+runners_m_r %>% 
+  count(fixedOdds.bettingStatus, parimutuel.bettingStatus)
+```
+
+```{r, warning=FALSE, message=FALSE}
+runners_m_r <- runners_m_r %>% 
+  filter(parimutuel.bettingStatus != "Scratched")
+```
+
+To clean these missing prices up, I've substitued the missing tote values with the fixed odds win price, however there are `r runners_m_r %>% filter(parimutuel.returnWin == 0, is.na(fixedOdds.returnWin)) %>% nrow()` reords where a \$0 tote figure is missing in the fixed odds market all together. These are for late scratchings. Will remove these also, and for the rest, replace the tote with the fixed odds price.
+
+```{r, warning=FALSE, message=FALSE}
+# Will create a column called `treat_tote_care` to identify these.
+runners_m_r <- runners_m_r %>% 
+  mutate(filter_out = case_when(
+    parimutuel.returnWin == 0 & is.na(fixedOdds.returnWin) ~ "Y",
+    TRUE ~ "N"
+  )) %>% filter(filter_out == "N") %>% select(-filter_out) %>% 
+  mutate(treat_tote_care = case_when(
+    parimutuel.returnWin == 0 & fixedOdds.returnWin != 0 ~ "Y",
+    TRUE ~ "N"
+  )) %>% 
+  mutate(parimutuel.returnWin = case_when(
+    parimutuel.returnWin == 0 ~ fixedOdds.returnWin,
+    TRUE ~ parimutuel.returnWin
+  ))
+
+
+# Might also need to do this the other way for the fixed odds prices that are missing. Will call this `treat_fixed_odds_care`.
+runners_m_r <- runners_m_r %>% 
+  mutate(treat_fixed_odds_care = case_when(
+    is.na(fixedOdds.returnWin) ~ "Y",
+    TRUE ~ "N"
+  )) %>% 
+  mutate(fixedOdds.returnWin = case_when(
+    treat_fixed_odds_care == "Y" ~ parimutuel.returnWin,
+    TRUE ~ fixedOdds.returnWin
+  ))
+```
+
+### Winners
+
+Winners generally the lowest odds, not much difference between 2nd and 3rd, then increase in price
+
+```{r, warning=FALSE, message=FALSE}
+# runners_m_r %>% 
+#   ggplot(aes(x= parimutuel.returnWin, y= as.character(finishingPosition))) +
+#   geom_boxplot() +
+#   labs(x="Tote win price", y= "Finishing position") +
+#   ggtitle("FINISHING POSITION PRICES")
+#   xlim(0, 100)
+
+runners_m_r %>% 
+  ggplot(aes(x= parimutuel.returnWin, y= as.character(finishingPosition))) +
+  geom_jitter(alpha = 0.2) +
+  labs(x="Tote win price", y= "Finishing position") +
+  ggtitle("FINISHING POSITION PRICES", subtitle = "Each point represents a runner's price. Winners typically pay less.\nNote this is capped at $100") +
+  xlim(0, 100)
+```
+
+```{r, include=FALSE, warning=FALSE, message=FALSE}
+
+winners <- runners_m_r %>% 
+  filter(finishingPosition == 1)
+
+```
+
+Summary stats for all races show that the median price the winner pays is `r dollar(median(winners$parimutuel.returnWin))`. This is for all tracks.
+
+```{r, warning=FALSE, message=FALSE}
+winners %>% pull(parimutuel.returnWin) %>% summary()
+```
+
+```{r, warning=FALSE, message=FALSE}
+group_summary <- function(data, ..., x) {
+  data %>%                               # Summary by group using dplyr
+  group_by(...) %>% 
+  summarize(n_races = n(),
+            min = min({{x}}),
+            q1 = quantile({{x}}, 0.25),
+            median = median({{x}}),
+            mean = mean({{x}}),
+            q3 = quantile({{x}}, 0.75),
+            max = max({{x}}))
+}
+```
+
+Breaking this down, there is some variation between track, but not a hell of a lot. Sandown winners pay slightly less.
+
+```{r, warning=FALSE, message=FALSE}
+group_summary(runners_m_r %>% filter(finishingPosition == 1), group=meetingName, x=parimutuel.returnWin)
+```
+
+When looking at the class of race, The median win price is higher for group races than non-group races, suggesting that if you're looking for value, group races are where to target slightly higher priced runners.
+
+```{r, warning=FALSE, message=FALSE}
+group_summary(data=runners_m_r %>% filter(finishingPosition == 1), group=is_group_race, x=parimutuel.returnWin)
+```
+
+```{r, warning=FALSE, message=FALSE}
+group_summary(data=runners_m_r %>% filter(finishingPosition == 1), group=meetingName, weatherCondition, x=parimutuel.returnWin) %>% 
+  ggplot(aes(x=median, y=group, fill = weatherCondition)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_x_continuous(labels = dollar) +
+  ggtitle("MEDIAN WINNER'S PRICE BY VENUE AND WEATHER") +
+  theme(axis.title = element_blank())
+```
+
+```{r, warning=FALSE, message=FALSE}
+group_summary(data=runners_m_r %>% filter(finishingPosition == 1), group=meetingName, trackCondition, x=parimutuel.returnWin) %>% 
+  ggplot(aes(x=median, y=group, fill = trackCondition)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_x_continuous(labels = dollar) +
+  ggtitle("MEDIAN WINNER'S PRICE BY VENUE AND TRACK CONDITION") +
+  theme(axis.title = element_blank())
+```
+
+```{r statistical_modelling, include=FALSE, eval=FALSE}
+myData <- runners_m_r %>% filter(finishingPosition == 1) %>% pull(parimutuel.returnWin)
+
+library(dglm)
+fit <- dglm(myData~1, family=Gamma(link="log"), mustart=mean(myData))
+summary(fit)
+
+
+mlgamma <- function(x) {
+  fit <- dglm(
+    x~1, 
+    family=Gamma(link="log"), 
+    mustart=mean(x)
+  )
+  mu <- exp(fit$coefficients)
+  shape <- exp(-fit$dispersion.fit$coefficients)
+  scale <- mu/shape
+  result <- c(shape, scale)
+  names(result) <- c("shape", "scale")
+  result
+}
+
+set.seed(42)
+
+
+shape <- mlgamma(myData)["shape"] %>% unname()
+scale <- mlgamma(myData)["scale"] %>% unname()
+
+simData <- rgamma(n=length(myData), shape, scale)
+
+hist(myData)
+hist(simData)
+
+
+hist(myData)
+
+# calculate implied probabilities using odds:
+test_meet <- runners_m_r %>% 
+  filter(meetingDate == "2021-01-01",
+         raceNumber == 1) %>% 
+  mutate(imp_prob = (1/parimutuel.returnWin)*100)
+
+
+```
+
+### Favourites
+
+Turning our attention on the performance of favourites...
+
+```{r, warning=FALSE, message=FALSE}
+# select $2.8 as the heavy fav - it's the 5th percentile. Can change this if needed
+heavy_fav_cutoff <- quantile(runners_m_r$parimutuel.returnWin, probs = seq(0, 1, 0.05))["5%"] %>% unname()
+
+runners_m_r <- runners_m_r %>% 
+  arrange(meetingDate, meetingName, raceNumber, raceName, parimutuel.returnWin) %>% 
+  group_by(meetingDate, meetingName, raceNumber, raceName) %>% 
+  mutate(betting_rank = floor(rank(parimutuel.returnWin))) %>% ungroup() %>% 
+  mutate(heavy_fav = case_when(
+    betting_rank == 1 & parimutuel.returnWin <= heavy_fav_cutoff ~ "Y",
+    betting_rank == 1 & parimutuel.returnWin > heavy_fav_cutoff ~ "N",
+    TRUE ~ "Non Fav"
+  ))
+
+
+runners_m_r <- runners_m_r %>% 
+  group_by(meetingDate, meetingName, raceNumber, raceName) %>% 
+  mutate(n_winners = sum(finishingPosition == 1)) %>% ungroup()
+
+```
+
+How often did the favourite win?
+
+Slight variation between tracks, but fav generally wins about 30-35% of the time. At the Valley, they win the least frequently.
+
+```{r, warning=FALSE, message=FALSE}
+runners_m_r %>% 
+  filter(betting_rank == 1) %>% 
+  mutate(finishingPosition = factor(finishingPosition, levels = c(1,2,3,4,0))) %>% 
+  group_by(meetingName, finishingPosition) %>% 
+  summarise(`Num Wins` = n()) %>% 
+  mutate(`Num Races` = sum(`Num Wins`),
+         `Win %`=`Num Wins` / sum(`Num Wins`)) %>% ungroup() %>% 
+  filter(finishingPosition == 1) %>% 
+  select(-finishingPosition) %>% 
+  mutate(`Win %` = percent(`Win %`, accuracy = 0.1)) %>% 
+  gt() %>% 
+  tab_header("FAVOURITE WIN %", subtitle = "Measuring the proportion of races won by a favourite") %>% 
+  tab_style(
+     locations = cells_column_labels(columns = everything()),
+     style     = list(
+       #Give a thick border below
+       cell_borders(sides = "bottom", weight = px(3)),
+       #Make text bold
+       cell_text(weight = "bold")
+     )
+   ) %>% 
+   #Apply different style to the title
+   tab_style(
+     locations = cells_title(groups = "title"),
+     style     = list(
+       cell_text(weight = "bold", size = 24)
+     )
+   )
+```
+
+What about the finishing position of the favourite?
+
+There's an equal split by thirds between winning, in the placings and 4th or lower.
+
+```{r}
+runners_m_r %>% 
+  filter(betting_rank == 1) %>% 
+  mutate(finishingPosition = factor(finishingPosition, levels = c(1,2,3,4,0))) %>% 
+  group_by(finishingPosition) %>% 
+  summarise(`Num Wins` = n()) %>% 
+  mutate(`Num Races` = sum(`Num Wins`),
+         `Win %`=`Num Wins` / sum(`Num Wins`)) %>% ungroup() %>% 
+  mutate(`Win %` = percent(`Win %`, accuracy = 0.1)) %>% 
+  gt() %>% 
+  tab_header("FAVOURITE FINISHING POSITION", subtitle = "Overall finishing positions, for all tracks. The favourite wins a third of the time, finishes in the placings roughly a third of the time, and 4th or lower a third of the time") %>% 
+  tab_style(
+     locations = cells_column_labels(columns = everything()),
+     style     = list(
+       #Give a thick border below
+       cell_borders(sides = "bottom", weight = px(3)),
+       #Make text bold
+       cell_text(weight = "bold")
+     )
+   ) %>% 
+   #Apply different style to the title
+   tab_style(
+     locations = cells_title(groups = "title"),
+     style     = list(
+       cell_text(weight = "bold", size = 24)
+     )
+   )
+```
+
+Breaking it down by track shows no real difference:
+
+```{r}
+runners_m_r %>% 
+  filter(betting_rank == 1) %>% 
+  mutate(finishingPosition = factor(finishingPosition, levels = c(1,2,3,4,0))) %>% 
+  group_by(meetingName, finishingPosition) %>% 
+  summarise(`Num Wins` = n()) %>% 
+  mutate(`Num Races` = sum(`Num Wins`),
+         `Win %`=`Num Wins` / sum(`Num Wins`)) %>% ungroup() %>% 
+  mutate(`Win %` = percent(`Win %`, accuracy = 0.1)) %>% 
+  group_by(meetingName) %>% 
+  gt() %>% 
+  tab_header("FAVOURITE FINISHING POSITION BY TRACK", subtitle = "Overall finishing positions, by track. No real difference by track.") %>% 
+  tab_style(
+     locations = cells_column_labels(columns = everything()),
+     style     = list(
+       #Give a thick border below
+       cell_borders(sides = "bottom", weight = px(3)),
+       #Make text bold
+       cell_text(weight = "bold")
+     )
+   ) %>% 
+   #Apply different style to the title
+   tab_style(
+     locations = cells_title(groups = "title"),
+     style     = list(
+       cell_text(weight = "bold", size = 24)
+     )
+   )
+```
+
+### What about when there's a heavy fav?
+
+There was a heavy fav (in this case any horse paying `r heavy_fav_cutoff %>% dollar()` or less), in `r runners_m_r %>% filter(heavy_fav == "Y") %>% nrow` of `r runners_m_r %>% distinct(meetingName, meetingDate, raceName) %>% nrow()` races.
+
+In these `r runners_m_r %>% filter(heavy_fav == "Y") %>% nrow` races, the win rate of the fav jumped to between 36% and 45%.
+
+**Note:** The implied win probability of a runner paying `r heavy_fav_cutoff %>% dollar()` is `r (1/heavy_fav_cutoff) %>% percent(accuracy=0.1)`
+
+```{r, warning=FALSE, message=FALSE}
+runners_m_r %>% 
+  filter(heavy_fav == "Y") %>% 
+  mutate(finishingPosition = factor(finishingPosition, levels = c(1,2,3,4,0))) %>% 
+  group_by(meetingName, finishingPosition) %>% 
+  summarise(`Num Wins` = n()) %>% 
+  mutate(`Num Races` = sum(`Num Wins`),
+         `Win %`=`Num Wins` / sum(`Num Wins`)) %>% ungroup() %>% 
+  filter(finishingPosition == 1) %>% 
+  select(-finishingPosition) %>% 
+  mutate(`Win %` = percent(`Win %`, accuracy = 0.1)) %>% 
+  gt() %>% 
+  tab_header("HEAVY FAVOURITE WIN %", subtitle = "Measuring the proportion of races won by a heavy favourite") %>% 
+  tab_style(
+     locations = cells_column_labels(columns = everything()),
+     style     = list(
+       #Give a thick border below
+       cell_borders(sides = "bottom", weight = px(3)),
+       #Make text bold
+       cell_text(weight = "bold")
+     )
+   ) %>% 
+   #Apply different style to the title
+   tab_style(
+     locations = cells_title(groups = "title"),
+     style     = list(
+       cell_text(weight = "bold", size = 24)
+     )
+   )
+```
+
+What if we chucked \$100 on every race there was a heavy fav?
+
+```{r, include=FALSE, warning=FALSE, message=FALSE}
+heavy_favs <- runners_m_r %>% 
+  filter(heavy_fav == "Y")
+
+# there are two races where there was an equal fav in the heavy_favs dataset.
+#   meetingDate meetingName raceNumber     n
+ #   <chr>       <chr>       <chr>      <int>
+ # 1 2022-04-25  FLEMINGTON  1              2
+ # 2 2022-07-13  SANDOWN     3              2
+
+# to only get one, I'll keep the favourite that was also the favourite in fixedOdds
+heavy_favs <- heavy_favs %>% 
+  arrange(meetingDate, meetingName, raceNumber, raceName, parimutuel.returnWin, fixedOdds.returnWin, fixedOdds.returnWinOpen) %>% 
+  distinct(meetingDate, meetingName, raceNumber, raceName, .keep_all = T)
+
+
+heavy_favs <- heavy_favs %>% 
+  mutate(win_amount = case_when(
+    finishingPosition == 1 ~ (parimutuel.returnWin * 100)/n_winners,
+    TRUE ~ 0
+  ))
+
+# using $2.8 as the heavy fav cutoff, and spending $100 per race, we would've earned $64,712, but spent  $73,400 - a loss of $8688 - YUCK
+# sum(heavy_favs$win_amount) - nrow(heavy_favs) * 100
+```
+
+There were `r comma(nrow(heavy_favs))` races with a heavy favourite. That would cost us `r dollar(nrow(heavy_favs) * 100)`.
+
+Here's the bad news... the return would be `r dollar(sum(heavy_favs$win_amount))`:
+
+> **a loss of `r dollar(sum(heavy_favs$win_amount) - nrow(heavy_favs) * 100)`...**
+
+```{r}
+heavy_favs %>% 
+  # filter(betting_rank == 1) %>% 
+  mutate(finishingPosition = factor(finishingPosition, levels = c(1,2,3,4,0))) %>% 
+  group_by(finishingPosition) %>% 
+  summarise(`Num Wins` = n()) %>% 
+  mutate(`Num Races` = sum(`Num Wins`),
+         `Win %`=`Num Wins` / sum(`Num Wins`)) %>% ungroup() %>% 
+  mutate(`Win %` = percent(`Win %`, accuracy = 0.1)) %>% 
+  gt() %>% 
+  tab_header("HEAVY FAVOURITE FINISHING POSITION", subtitle = "Overall finishing positions, for all tracks in races where there was a 'heavy' favourite. The favourite wins ~41% of the time, finishes in the placings just over a third of the time, and 4th or lower ~24% of the time") %>% 
+  tab_style(
+     locations = cells_column_labels(columns = everything()),
+     style     = list(
+       #Give a thick border below
+       cell_borders(sides = "bottom", weight = px(3)),
+       #Make text bold
+       cell_text(weight = "bold")
+     )
+   ) %>% 
+   #Apply different style to the title
+   tab_style(
+     locations = cells_title(groups = "title"),
+     style     = list(
+       cell_text(weight = "bold", size = 24)
+     )
+   )
+```
+
+## Jockeys
+
+We can use the odds to calculate the implied probabilities of winning, then use these implied probabilities to understand which jockeys win (or lose) more than expected.
+
+Traditional methods of analysing jockey success purely focus on number of wins. We can calculate that here:
+
+```{r}
+jockeys <- runners_m_r %>% 
+  filter(parimutuel.bettingStatus == "Normal")
+
+
+jockeys %>% 
+  filter(finishingPosition == 1) %>% 
+  count(riderDriverName, sort = T) %>% head(10)
+
+
+jockeys %>% 
+  # filter(finishingPosition == 1) %>% 
+  group_by(riderDriverName) %>% 
+  summarise(n_races = n(),
+            n_winners = sum(finishingPosition == 1),
+            win_perc = n_winners / n_races) %>% 
+  arrange(desc(n_winners)) %>% head(10)
+
+
+jockeys %>% 
+  # filter(finishingPosition == 1) %>% 
+  group_by(riderDriverName) %>% 
+  summarise(n_races = n(),
+            n_winners = sum(finishingPosition == 1),
+            win_perc = n_winners / n_races) %>% 
+  arrange(desc(win_perc)) %>% head(10)
+
+
+jockeys %>% 
+  # filter(finishingPosition == 1) %>% 
+  group_by(riderDriverName) %>% 
+  summarise(n_races = n(),
+            n_winners = sum(finishingPosition == 1),
+            win_perc = n_winners / n_races) %>% 
+  ungroup() %>% 
+  ggplot(aes(x=n_races, y= win_perc)) +
+  geom_point()
+
+
+jockeys %>% 
+  # filter(finishingPosition == 1) %>% 
+  group_by(riderDriverName) %>% 
+  summarise(n_races = n(),
+            n_winners = sum(finishingPosition == 1),
+            win_perc = n_winners / n_races) %>% 
+  ungroup() %>% 
+  summarise(avg_win_rate = mean(win_perc))
+
+
+```
+
+```{r}
+calc_imp <- function(nums) {
+  inv_nums <- 1/nums
+  imp_prb <- inv_nums / sum(inv_nums, na.rm = T)
+  return(imp_prb)
+}
+
+
+
+jockeys_exp_wins <- jockeys %>% 
+  group_by(meetingDate, meetingName, raceNumber) %>% 
+  mutate(imp_prob = calc_imp(parimutuel.returnWin)) %>% ungroup() %>%
+  group_by(riderDriverName) %>%  
+  summarise(n_races = n(),
+            n_wins = sum(finishingPosition == 1),
+            expected_wins = sum(imp_prob)) %>% 
+  mutate(win_perc = n_wins / n_races,
+         wins_above_exp = n_wins - expected_wins)
+
+
+jockeys_track_exp_wins <- jockeys %>% 
+  group_by(meetingDate, meetingName, raceNumber) %>% 
+  mutate(imp_prob = calc_imp(parimutuel.returnWin)) %>% ungroup() %>%
+  group_by(riderDriverName, meetingName) %>%  
+  summarise(n_races = n(),
+            n_wins = sum(finishingPosition == 1),
+            expected_wins = sum(imp_prob)) %>% 
+  mutate(win_perc = n_wins / n_races,
+         wins_above_exp = n_wins - expected_wins)
+
+
+
+
+
+
+jockeys %>% 
+  mutate(win_prob = 1/parimutuel.returnWin) %>% 
+  group_by(riderDriverName) %>% 
+  summarise(n_races = n(),
+            n_wins = sum(finishingPosition == 1),
+            expected_wins = sum(win_prob)) %>% 
+  mutate(wins_above_exp = n_wins - expected_wins) %>% 
+  arrange(desc(wins_above_exp)) %>% 
+  head(20)
+
+
+jockeys %>% 
+  mutate(win_prob = 1/parimutuel.returnWin) %>% 
+  group_by(riderDriverName) %>% 
+  summarise(n_races = n(),
+            n_wins = sum(finishingPosition == 1),
+            expected_wins = sum(win_prob)) %>% 
+  mutate(wins_above_exp = n_wins - expected_wins) %>% 
+  mutate(avg_above = wins_above_exp / n_races) %>% 
+  arrange(wins_above_exp) %>% 
+  head(20)
+
+jockeys %>% 
+  mutate(win_prob = 1/parimutuel.returnWin) %>% 
+  group_by(riderDriverName) %>% 
+  summarise(n_races = n(),
+            n_wins = sum(finishingPosition == 1),
+            expected_wins = sum(win_prob)) %>% 
+  mutate(wins_above_exp = n_wins - expected_wins) %>% 
+  mutate(avg_above = wins_above_exp / n_races) %>% 
+  arrange(avg_above) %>% 
+  head(20)
+```
