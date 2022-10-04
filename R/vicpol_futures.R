@@ -16,7 +16,7 @@ httr::set_config(httr::use_proxy(url = Sys.getenv("PROXY_URL"),
                                  password= Sys.getenv("PROXY_PASSWORD")))
 
 
-futures_markets <- get_sports_market(competition_name = "Victorian Politics")
+futures_markets <- tryCatch(get_sports_market(competition_name = "Victorian Politics"), error = function(e) data.frame())
 
 futures_markets$scrape_date <- scrape_date
 

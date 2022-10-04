@@ -16,10 +16,10 @@ httr::set_config(httr::use_proxy(url = Sys.getenv("PROXY_URL"),
                                  password= Sys.getenv("PROXY_PASSWORD")))
 
 
-nbl_markets <- get_sports_market(competition_name = "NBL")
-futures_markets <- get_sports_market(competition_name = "NBL Futures")
+nbl_markets <- tryCatch(get_sports_market(competition_name = "NBL"), error = function(e) data.frame())
+futures_markets <- tryCatch(get_sports_market(competition_name = "NBL Futures"), error = function(e) data.frame())
 
-futures_markets <- dplyr::bind_rows(nbl_markets, futures_markets)
+futures_markets <- dplyr::bind_rows(futures_markets, nbl_markets)
 
 futures_markets$scrape_date <- scrape_date
 
