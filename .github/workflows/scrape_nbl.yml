@@ -21,15 +21,15 @@ jobs:
       - uses: actions/checkout@v2
       - uses: r-lib/actions/setup-r@master
       - name: Package Installation
-        run: Rscript -e 'install.packages(c("remotes", "dplyr", "httr"))'
+        run: Rscript -e 'install.packages(c("remotes", "dplyr", "httr", "piggyback"))'
       - name: bettRtab Installation
         run: Rscript -e 'remotes::install_github("JaseZiv/bettRtab")'
       - name: Update futures
         run: Rscript -e 'source(file.path("R", "nbl_betting.R"), echo = TRUE)'
-      - name: Commit
-        run: |
-          git config --global user.name 'JaseZiv'
-          git config --global user.email 'jaseziv83@gmail.com'
-          git add .
-          git commit -m 'updating NFL futures' || echo "No changes to commit"
-          git push || echo "No changes to commit"
+      # - name: Commit
+      #   run: |
+      #     git config --global user.name 'JaseZiv'
+      #     git config --global user.email 'jaseziv83@gmail.com'
+      #     git add .
+      #     git commit -m 'updating NFL futures' || echo "No changes to commit"
+      #     git push || echo "No changes to commit"
