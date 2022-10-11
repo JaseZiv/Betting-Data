@@ -1,4 +1,4 @@
-name: Scrape NBL markets
+name: Scrape sports markets
 
 # At 22:01UTC daily (08:01 AEST).
 on:
