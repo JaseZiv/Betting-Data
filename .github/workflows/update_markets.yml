@@ -2,14 +2,14 @@ name: Scrape NBL markets
 
 # At 22:01UTC daily (08:01 AEST).
 on:
-  # push:
-  #   branches:
-  #     - main
-  schedule:
-    - cron: "1 22 * * *"
+  push:
+    branches:
+      - main
+  # schedule:
+  #   - cron: "1 22 * * *"
 
 jobs:
-  update-nbl-betting:
+  update-markets-betting:
     runs-on: macOS-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
