@@ -78,6 +78,6 @@ get_data(current_market = "A League Men", futures_market = "A League Men Futures
 get_data(current_market = "...", futures_market = "NFL Futures", file_name = "nfl_futures")
 
 
-get_data(current_market = "...", futures_market = "Victorian Politics", file_name = "vic_pol_futures")
+# get_data(current_market = "...", futures_market = "Victorian Politics", file_name = "vic_pol_futures")
 
 rm(list = ls())
