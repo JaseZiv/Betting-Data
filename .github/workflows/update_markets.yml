@@ -26,3 +26,5 @@ jobs:
         run: Rscript -e 'remotes::install_github("JaseZiv/bettRtab")'
       - name: Update futures
         run: Rscript -e 'source(file.path("R", "update_markets.R"), echo = TRUE)'
+      - name: Update world cup
+        run: Rscript -e 'source(file.path("R", "womens_wc_2023.R"), echo = TRUE)'
