@@ -26,12 +26,3 @@ jobs:
         run: Rscript -e 'remotes::install_github("JaseZiv/bettRtab")'
       - name: Update futures
         run: Rscript -e 'source(file.path("R", "update_markets.R"), echo = TRUE)'
-      - name: Update world cup
-        run: Rscript -e 'source(file.path("R", "wc_2022.R"), echo = TRUE)'
-      # - name: Commit
-      #   run: |
-      #     git config --global user.name 'JaseZiv'
-      #     git config --global user.email 'jaseziv83@gmail.com'
-      #     git add .
-      #     git commit -m 'updating NFL futures' || echo "No changes to commit"
-      #     git push || echo "No changes to commit"
