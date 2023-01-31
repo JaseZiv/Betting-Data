@@ -1,0 +1,457 @@
+---
+title: "Understanding the Melbourne Saturday Quaddie Better"
+execute:
+  echo: false
+format:
+  html:
+    embed-resources: true
+    theme: lux
+editor: visual
+---
+
+
+To start, I thought it apt to include a quote from W. Edwards Demming. This isn't a history lesson so look him up if you're curious:
+
+> Without data, you’re just another person with an opinion.
+
+Which leads me to another quote:
+
+> Opinions are like arseholes; everyone has them.
+
+
+****
+
+
+## Intro
+
+Right blokes... This document is not a shitty attempt to sway our decision making as Croft is wont to do... I just thought it was time to better understand what's going on during the Saturday quaddies we're trying to hit. 
+
+Don't get too bogged down in any of the stats in it, will try to condense it into pretty simple language. 
+
+This isn't intended to be is a swipe at any team. We're just talking facts here, no bullshit. Also, Toff, don't feel threatened - the spreadsheet can keep going, but this at least gives us some actionable insights.
+
+As of the weekend just gone (17th December, 2022), we've had 17 punting weeks. We started this season on the 27th of August, 2022. Thanks to Killa forgetting to put them on twice, we've only had a crack at 15 quaddies (one of these we put it on twice to account for a miss). In this report, I've included the two weeks we didn't get it on as part of our performance.
+
+I will look at the composition of each of the four legs from a betting standpoint, and also our aggregated performance in those legs over the season.
+
+
+### TL;DR
+
+If you can't be bothered reading any further, or can't understand the below, the main points:
+
+* The first leg of the quaddie looks to be easier to get a winner than the last leg
+* We've only hit the last leg on 3 of the 17 attempts
+* We take the field in the first leg
+* We only take two runners in the last leg
+* We have lost on 14 of 15 quaddies we've bet on, and 16 of 17 if we got the other two on
+
+***
+
+```{r, warning=FALSE, message=FALSE}
+# library(bettRtab)
+# library(tidyverse)
+# library(lubridate)
+# library(scales)
+# library(gt)
+# library(here)
+# 
+# 
+# # Update ------------------------------------------------------------------
+#
+# melb_sat_races <-  readRDS("analysis/racing-statistics/melb_sat_races.rds")
+#
+#
+# z <- melb_sat_races[length(melb_sat_races)]
+#
+# last_date <- z[[1]]$meeting$meetingDate %>% unlist() %>% ymd()
+#
+# meets <- load_race_meet_meta(2022)
+#
+#
+# meet_dates_df <- meets %>%
+#   mutate(meetingDate = ymd(meetingDate)) %>%
+#   mutate(meet_day = as.character(wday(meetingDate, label = T))) %>%
+#   filter(venueMnemonic == "M", raceType == "R", meet_day == "Sat") %>%
+#   # filter(meetingName %in% c("SANDOWN", "CAULFIELD", "FLEMINGTON", "MOONEE VALLEY")) %>%
+#   filter(meetingDate > last_date)
+#
+#
+# meet_urls <- meet_dates_df$races
+#
+# urls <- c()
+#
+# for(i in meet_urls) {
+#   each <- i[["_links"]] %>% unlist()
+#   urls <- c(urls, each) %>% unname()
+# }
+#
+#
+# melb_sat_races_updated <- get_past_race_content(urls = urls)
+#
+# melb_sat_races <- append(melb_sat_races, melb_sat_races_updated)
+#
+#
+# updated_missing_meet <- bettRtab::get_race_meet_meta("2022-11-19") %>%
+#   mutate(meetingDate = ymd(meetingDate)) %>%
+#   mutate(meet_day = as.character(wday(meetingDate, label = T))) %>%
+#   filter(venueMnemonic == "M", raceType == "R", meet_day == "Sat")
+#
+# meet_urls <- updated_missing_meet$races
+#
+# urls <- c()
+#
+# for(i in meet_urls) {
+#   each <- i[["_links"]] %>% unlist()
+#   urls <- c(urls, each) %>% unname()
+# }
+#
+#
+# melb_sat_races_missing <- get_past_race_content(urls = urls)
+#
+# melb_sat_races <- append(melb_sat_races, melb_sat_races_missing)
+#
+# saveRDS(melb_sat_races, "analysis/racing-statistics/melb_sat_races.rds")
+
+
+
+
+# melb_sat_races <- readRDS(here("analysis", "racing-statistics", "melb_sat_races.rds"))
+# runners_m_r <- parse_runners(melb_sat_races)
+# 
+# pools <- parse_pools(melb_sat_races)
+# 
+# pools <- pools %>%
+#   mutate(meetingDate = ymd(meetingDate)) %>%
+#   filter(wageringProduct == "Quaddie")
+# 
+# 
+# dividends <- parse_dividends(melb_sat_races)
+# 
+# dividends <- dividends %>%
+#   filter(wageringProduct == "Quaddie")
+# 
+# # races21 <- bettRtab::load_race_meet_meta(cal_year = 2021)
+# race_meta <- bettRtab::load_race_meet_meta(cal_year = 2022)
+# 
+# 
+# race_meta <- race_meta %>%
+#   mutate(meetingDate = ymd(meetingDate)) %>%
+#   mutate(meet_day = as.character(wday(meetingDate, label = T))) %>%
+#   filter(venueMnemonic == "M", raceType == "R", meet_day == "Sat") %>%
+#   select(meetingDate, meetingName, weatherCondition, trackCondition)
+# 
+# 
+# missing_first_leg <- "2022-10-08"
+# 
+# missing_race_meta <- runners_m_r %>%
+#   filter(meetingDate == missing_first_leg) %>%
+#   slice(1) %>%
+#   select(meetingDate, location, meetingName, raceType, venueMnemonic, raceNumber, raceName, raceClassConditions)
+# 
+# missing_race_meta <- missing_race_meta %>%
+#   mutate(raceNumber = "7",
+#          raceName = "Neds Might And Power",
+#          raceClassConditions = "WFA-G1")
+# 
+# missing_runners <- data.frame(runnerName = as.character(c("ZAAKI", "I'M THUNDERSTRUCK", "ALLIGATOR BLOOD", "MR BRIGHTSIDE", "MO'UNGA", "NONCONFORMIST", "ANAMOE", "BENAUD")),
+#                               runnerNumber = 1:8,
+#                               finishingPosition = c(3,2,0,4,0,0,1,0),
+#                               fixedOdds.returnWin = c(5,7,6.5,23,11,81,2.1,21),
+#                               fixedOdds.returnPlace = c(1.6,1.9,1.85,4.2,2.5,10,1.2,3.9),
+#                               fixedOdds.bettingStatus = c("Placing", "Placing", "Loser", "Loser", "Loser", "Loser", "Winner", "Loser"),
+#                               parimutuel.bettingStatus = rep("Normal", 8),
+#                               parimutuel.returnWin = c(5.1,6.1,6.1,17,11.1,63.6,2.2,20.2),
+#                               parimutuel.returnPlace = c(1.6,1.9,2,3.3,2.4,8.8,1.2,3.6))
+# 
+# 
+# missing_race_meta <- missing_race_meta %>% bind_cols(missing_runners)
+# 
+# 
+# runners_m_r <- runners_m_r %>%
+#   bind_rows(missing_race_meta) %>%
+#   arrange(meetingDate, as.numeric(raceNumber), as.numeric(runnerNumber))
+# 
+# 
+# # because the initial scrape included Cranbourne to test for errors
+# runners_m_r <- runners_m_r %>%
+#   mutate(meetingDate = ymd(meetingDate)) %>%
+#   # filter(meetingName != "CRANBOURNE") %>%
+#   left_join(race_meta, by = c("meetingDate", "meetingName")) %>%
+#   mutate(is_group_race = str_detect(raceClassConditions, "GP"))
+# 
+# 
+# 
+# 
+# quad_legs <- pools %>%
+#   distinct(meetingDate, meetingName, raceNumber) %>%
+#   arrange(meetingDate, as.numeric(raceNumber)) %>%
+#   group_by(meetingDate) %>%
+#   mutate(legNumber = row_number()) %>%
+#   ungroup()
+# 
+# runners_m_r <- runners_m_r %>%
+#   left_join(quad_legs, by = c("meetingDate", "meetingName", "raceNumber"))
+# 
+# saveRDS(runners_m_r, file.path("analysis", "racing-statistics", "punters-club", "runners_m_r.rds"))
+```
+
+
+
+```{r, warning=FALSE, message=FALSE}
+library(bettRtab)
+library(tidyverse)
+library(lubridate)
+library(scales)
+library(gt)
+library(here)
+
+gt_theme_jason <- function(data, ...){
+  data %>% 
+    opt_all_caps()  %>%
+    # opt_table_font(
+    #   font = list(
+    #     google_font("Offside"),
+    #     default_fonts()
+    #   )
+    # )  %>% 
+    opt_row_striping() %>% 
+    tab_options(
+      row.striping.background_color = "#fafafa",
+      table_body.hlines.color = "#f6f7f7",
+      source_notes.font.size = 12,
+      table.font.size = 16,
+      table.width = px(700),
+      heading.align = "left",
+      heading.title.font.size = 30,
+      heading.subtitle.font.size = 16,
+      table.border.top.color = "transparent",
+      table.border.top.width = px(3),
+      data_row.padding = px(7),
+      column_labels.font.size = 20,
+      ...
+    ) 
+}
+
+
+runners_m_r <- readRDS(here("analysis", "racing-statistics", "punters-club", "runners_m_r.rds"))
+
+
+# load in the quaddie numbers picked by punters club
+punters_nums <- read.csv(here("analysis", "racing-statistics", "punters-club", "punters_quaddie_numbers.csv"))
+
+
+quaddie_winners <- runners_m_r %>%
+  filter(meetingDate >= ymd("2022-08-27")) %>%
+  filter(!is.na(legNumber)) %>%
+  filter(finishingPosition == 1)
+
+
+quaddie_winners <- quaddie_winners %>%
+  left_join(punters_nums %>% mutate(Date = ymd(Date)), by = c("meetingDate" = "Date"))
+
+
+
+for(i in 1:nrow(quaddie_winners)) {
+  if(quaddie_winners$legNumber[i] == 1) {
+    quaddie_winners$gotLeg[i] <- "Yes"
+  } else if (quaddie_winners$legNumber[i] == 2 && as.character(quaddie_winners$runnerNumber[i]) %in% unlist(strsplit(quaddie_winners$Leg2[i], ","))) {
+    quaddie_winners$gotLeg[i] <- "Yes"
+  } else if (quaddie_winners$legNumber[i] == 3 && as.character(quaddie_winners$runnerNumber[i]) %in% unlist(strsplit(quaddie_winners$Leg3[i], ","))) {
+    quaddie_winners$gotLeg[i] <- "Yes"
+  } else if (quaddie_winners$legNumber[i] == 4 && as.character(quaddie_winners$runnerNumber[i]) %in% unlist(strsplit(quaddie_winners$Leg4[i], ","))) {
+    quaddie_winners$gotLeg[i] <- "Yes"
+  } else {
+    quaddie_winners$gotLeg[i] <- "No"
+  }
+}
+
+
+quaddie_races <- runners_m_r %>%
+  filter(meetingDate >= ymd("2022-08-27")) %>%
+  filter(!is.na(legNumber)) %>%
+  left_join(punters_nums %>% mutate(Date = ymd(Date)), by = c("meetingDate" = "Date"))
+
+quaddie_races$picked_in_quad <- NA_character_
+
+
+for(i in 1:nrow(quaddie_races)) {
+  if(quaddie_races$legNumber[i] == 1) {
+    quaddie_races$picked_in_quad[i] <- "Yes"
+  } else if (quaddie_races$legNumber[i] == 2 && as.character(quaddie_races$runnerNumber[i]) %in% unlist(strsplit(quaddie_races$Leg2[i], ","))) {
+    quaddie_races$picked_in_quad[i] <- "Yes"
+  } else if (quaddie_races$legNumber[i] == 3 && as.character(quaddie_races$runnerNumber[i]) %in% unlist(strsplit(quaddie_races$Leg3[i], ","))) {
+    quaddie_races$picked_in_quad[i] <- "Yes"
+  } else if (quaddie_races$legNumber[i] == 4 && as.character(quaddie_races$runnerNumber[i]) %in% unlist(strsplit(quaddie_races$Leg4[i], ","))) {
+    quaddie_races$picked_in_quad[i] <- "Yes"
+  } else {
+    quaddie_races$picked_in_quad[i] <- "No"
+  }
+}
+
+```
+
+
+
+## Our Performance
+
+So below is how we've gone over each of the four legs as a collective.
+
+Obviously, we're running at 100% success in the first leg... you don't need to be a genius to understand that taking the field will do that.
+
+There is a negative correlation between the leg number and our performance - that means as the legs progress, we get shitter. Punting team Group B is running at just at just over 50% in the third leg, while our strategy of picking only two runners in the fourth leg sees us hitting on 3 of the 17 attempts (17.6%). There is an caveat on the Group B leg three performance - the two weeks we didn't get the quaddie on means we don't know what numbers Kil would've backed in that leg - so there's a chance that we could have had two extra wins in the third leg (highly doubtful though).
+
+
+```{r, warning=FALSE, message=FALSE}
+# quaddie_winners %>% select(meetingDate, raceNumber, runnerNumber, Placed, tidyselect::contains("leg")) %>% view()
+
+
+quaddie_winners %>%
+  group_by(legNumber) %>%
+  mutate(number_races = n()) %>%
+  group_by(legNumber, gotLeg, number_races) %>%
+  summarise(number_winners = n()) %>% ungroup() %>%
+  mutate(win_percentage = number_winners / number_races) %>%
+  filter(gotLeg == "Yes") %>%
+  select(legNumber, number_winners, number_races, win_percentage) %>%
+  mutate(win_percentage = scales::percent(win_percentage, accuracy = 0.1)) %>% 
+  gt() %>%
+  cols_label(
+    legNumber = "Leg",
+    number_winners = "Number of Winners",
+    number_races = "Number of meets",
+    win_percentage = "Accuracy"
+  ) %>% 
+  cols_align("center") %>% 
+  gt_theme_jason()
+
+```
+
+
+We can also look at how many legs we've gotten over the trip.
+
+As we know, we've hit one quaddie. For a return of \$81 (\$31 profit.) We've spent `r scales::dollar(16 * 50)` (15 quaddies x \$50, plus an extra \$50 for a double up of a quaddie we had).
+
+We've also hit on two and three legs seven times each. Seven times we've come so close. On five of these 3-leg days, we've failed at the last leg 5 times.
+
+<p class="text-danger">We only allow ourselves two picks in this last leg...</p>
+
+
+```{r, warning=FALSE, message=FALSE}
+# three_leg_dates <- quaddie_winners %>% 
+#   group_by(meetingDate, gotLeg) %>% 
+#   summarise(n_legs = n()) %>% 
+#   filter(gotLeg == "Yes") %>%
+#   filter(n_legs ==3) %>% 
+#   pull(meetingDate)
+# 
+# quaddie_winners %>% 
+#   filter(meetingDate %in% three_leg_dates) %>% 
+#   filter(legNumber == 4) %>% 
+#   count(gotLeg)
+
+
+quaddie_winners %>% 
+  group_by(meetingDate, gotLeg) %>% 
+  summarise(n_legs = n()) %>% 
+  filter(gotLeg == "Yes") %>% 
+  group_by(n_legs) %>% 
+  summarise(n = n()) %>% ungroup() %>% 
+  gt() %>%
+  cols_label(
+    n_legs = "Legs Hit",
+    n = "Total"
+  ) %>% 
+  cols_align("center") %>% 
+  gt_theme_jason()
+```
+
+
+
+```{r}
+# quaddie_races %>%
+#   ggplot(aes(x=as.character(legNumber), y=parimutuel.returnWin, colour=picked_in_quad)) +
+#   geom_boxplot()
+```
+
+
+## Race Composition
+
+So now that we know how we've gone, we turn our attention to the race composition of the quaddie legs.
+
+Leg 1 typically has the least amount of runners, with a median of 11 runners start (excluded scratchings). I've used the 'median' here as a measure of center. Don't hurt your brains trying to google it, just know that it's a better representation of the average... Anyway, back to the point, typically there's 11 runners in leg 1, while there's typically 13 runners in the last leg. For the mathematically challenged, that's two more runners in the last leg than leg one... More horses to pick from  = harder to pick them. 
+
+
+<p class="text-danger">We only allow ourselves two picks in this last leg...</p>
+
+```{r, warning=FALSE, message=FALSE}
+runners_m_r %>%
+  filter(meetingDate >= ymd("2022-08-27")) %>%
+  filter(!is.na(legNumber)) %>%
+  filter(parimutuel.bettingStatus != "Scratched",
+         fixedOdds.bettingStatus != "LateScratched") %>%
+  group_by(meetingDate, meetingName, raceNumber, legNumber) %>%
+  summarise(n_runners = n()
+            # sd_race_odds = sd(parimutuel.returnWin),
+            # race_range = range(parimutuel.returnWin)[2] - range(parimutuel.returnWin)[1]
+            ) %>%
+  ungroup() %>%
+  group_by(legNumber) %>%
+  summarise(n_meets = n_distinct(meetingDate),
+            # avg_runners = mean(n_runners),
+            median_runners = median(n_runners)
+            # avg_sd_runners = mean(sd_race_odds),
+            # avg_range = median(race_range)
+            ) %>% 
+  gt() %>% 
+  cols_label(
+    legNumber = "Leg",
+    n_meets = "Number of meets",
+    median_runners = "Median Number of Runners"
+  ) %>% 
+  cols_align("center") %>% 
+  gt_theme_jason()
+```
+
+
+The median in price in the first leg is \$4.90. This median win price increases in each of the legs, peaking at \$7.70 in leg four. Put simply, horses with a lower price typically win in the first leg than they do in the last leg. 
+
+Additionally, there is the least amount of variation in the winning price in the first leg, while there's the most variation in the last leg. This again suggests that the last leg is typically harder to get a winner in.
+
+<p class="text-danger">We only allow ourselves two picks in this last leg...</p>
+
+
+```{r, warning=FALSE, message=FALSE}
+quaddie_winners %>%
+  # group_by(meetingDate, meetingName, raceNumber, legNumber) %>%
+  # summarise(n_runners = n()) %>%
+  # ungroup() %>%
+  group_by(legNumber) %>%
+  summarise(
+    median_win_price = median(parimutuel.returnWin),
+    sd_win_price = sd(parimutuel.returnWin)
+    ) %>% 
+  gt() %>% 
+  fmt_currency(columns = c(median_win_price, sd_win_price)) %>% 
+  cols_label(
+    legNumber = "Leg",
+    median_win_price = "Median Winning Price ($)",
+    sd_win_price = "Variation Win Price (standard deviation)"
+  ) %>% 
+  cols_align("center") %>% 
+  gt_theme_jason()
+
+
+
+# runners_m_r %>%
+#   filter(meetingDate >= ymd("2022-08-27")) %>%
+#   group_by(meetingDate, meetingName, raceNumber) %>%
+#   mutate(n_runners = n()) %>%
+#   filter(parimutuel.bettingStatus != "Scratched",
+#          finishingPosition == 1) %>%
+#   select(meetingDate, meetingName, raceNumber, parimutuel.returnWin, n_runners) %>%
+#   lm(parimutuel.returnWin ~ n_runners, data=.) %>% summary()
+
+
+```
+
+
