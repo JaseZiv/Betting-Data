@@ -75,7 +75,7 @@ get_data(current_market = "NBL", futures_market = "NBL Futures", file_name = "nb
 get_data(current_market = "A League Men", futures_market = "A League Men Futures", file_name = "aleague_betting")
 
 
-get_data(current_market = "...", futures_market = "NFL Futures", file_name = "nfl_futures")
+get_data(current_market = "NFL", futures_market = "NFL Futures", file_name = "nfl_futures")
 
 
 # get_data(current_market = "...", futures_market = "Victorian Politics", file_name = "vic_pol_futures")
