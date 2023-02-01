@@ -62,7 +62,7 @@ get_womens_wc_data <- function(file_name) {
 
   wc$scrape_date <- scrape_date
 
-  wc <- dplyr::bind_rows(wc_2022, existing)
+  wc <- dplyr::bind_rows(wc, existing)
 
   # return(futures)
   save_to_release(df= wc, file_name= file_name, release_tag= "sports")
