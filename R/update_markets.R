@@ -72,7 +72,7 @@ get_data <- function(current_market, futures_market, file_name) {
 # get_data(current_market = "NBL", futures_market = "NBL Futures", file_name = "nbl_betting")
 
 
-get_data(current_market = "A League Men", futures_market = "A League Men Futures", file_name = "aleague_betting")
+# get_data(current_market = "A League Men", futures_market = "A League Men Futures", file_name = "aleague_betting")
 
 get_data(current_market = "AFL", futures_market = "AFL Futures", file_name = "afl_betting")
 get_data(current_market = "Brownlow Medal", futures_market = "", file_name = "brownlow_betting")
