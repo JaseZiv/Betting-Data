@@ -77,7 +77,9 @@ get_data <- function(current_market, futures_market, file_name) {
 get_data(current_market = "AFL", futures_market = "AFL Futures", file_name = "afl_betting")
 get_data(current_market = "Brownlow Medal", futures_market = "", file_name = "brownlow_betting")
 
-# get_data(current_market = "NFL", futures_market = "NFL Futures", file_name = "nfl_futures")
+get_data(current_market = "NFL", futures_market = "NFL Futures", file_name = "nfl_futures")
+
+get_data(current_market = "English Premier League", futures_market = "English Premier League Futures", file_name = "epl_2023_24_markets")
 
 
 # get_data(current_market = "...", futures_market = "Victorian Politics", file_name = "vic_pol_futures")
