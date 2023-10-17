@@ -69,7 +69,7 @@ get_data <- function(current_market, futures_market, file_name) {
 # Update Markets ----------------------------------------------------------
 #===============================================================================================
 
-# get_data(current_market = "NBL", futures_market = "NBL Futures", file_name = "nbl_betting")
+get_data(current_market = "NBL", futures_market = "NBL Futures", file_name = "nbl_betting")
 
 
 # get_data(current_market = "A League Men", futures_market = "A League Men Futures", file_name = "aleague_betting")
