@@ -53,7 +53,9 @@ get_data <- function(current_market, futures_market, file_name) {
 
   futures <- dplyr::bind_rows(futures, markets)
 
-  futures$scrape_date <- scrape_date
+  if(nrow(futures) > 0) {
+    futures$scrape_date <- scrape_date
+  }
 
   futures <- dplyr::bind_rows(futures, betting)
 
