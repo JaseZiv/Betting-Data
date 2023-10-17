@@ -82,6 +82,9 @@ get_data(current_market = "NFL", futures_market = "NFL Futures", file_name = "nf
 get_data(current_market = "English Premier League", futures_market = "English Premier League Futures", file_name = "epl_2023_24_markets")
 
 
+get_data(current_market = "A League Men", futures_market = "A League Men Futures", file_name = "a_league_men")
+get_data(current_market = "A League Women", futures_market = "A League Women Futures", file_name = "a_league_women")
+
 # get_data(current_market = "...", futures_market = "Victorian Politics", file_name = "vic_pol_futures")
 
 rm(list = ls())
