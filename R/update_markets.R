@@ -7,9 +7,6 @@ library(piggyback)
 # this comes directly from the bettRtab_data repository.
 # Have just included it here to ensure we're getting all the currently available markets on demand when this script runs
 get_available_markets <- function() {
-  params = list(
-    `jurisdiction` = 'VIC'
-  )
 
   httr::set_config(httr::use_proxy(url = Sys.getenv("PROXY_URL"),
                                    port = as.numeric(Sys.getenv("PROXY_PORT")),
@@ -17,7 +14,16 @@ get_available_markets <- function() {
                                    password= Sys.getenv("PROXY_PASSWORD")))
 
 
-  res <- httr::GET(url = 'https://api.beta.tab.com.au/v1/tab-info-service/sports', query = params)
+  headers = c(
+    `User-Agent` = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+  )
+
+  params = list(
+    `jurisdiction` = "VIC"
+  )
+
+  res <- httr::GET(url = "https://api.beta.tab.com.au/v1/tab-info-service/sports", httr::add_headers(.headers=headers), query = params)
+
 
   a <- httr::content(res)
   b <- a$sports
@@ -191,15 +197,15 @@ get_data(sport_df = sports_df, current_market = "NBL", futures_market = "NBL Fut
 # get_data(current_market = "AFL", futures_market = "AFL Futures", file_name = "afl_betting")
 # get_data(current_market = "Brownlow Medal", futures_market = "", file_name = "brownlow_betting")
 
-get_data(sport_df = sports_df, current_market = "NFL", futures_market = "NFL Futures", file_name = "nfl_futures")
-
-get_data(sport_df = sports_df, current_market = "English Premier League", futures_market = "English Premier League Futures", file_name = "epl_2023_24_markets")
-
-
-get_data(sport_df = sports_df, current_market = "A League Men", futures_market = "A League Men Futures", file_name = "a_league_men")
-get_data(sport_df = sports_df, current_market = "A League Women", futures_market = "A League Women Futures", file_name = "a_league_women")
-
-get_data(sport_df = sports_df, current_market = "EuroLeague", futures_market = "", file_name = "euroleague_men")
+# get_data(sport_df = sports_df, current_market = "NFL", futures_market = "NFL Futures", file_name = "nfl_futures")
+#
+# get_data(sport_df = sports_df, current_market = "English Premier League", futures_market = "English Premier League Futures", file_name = "epl_2023_24_markets")
+#
+#
+# get_data(sport_df = sports_df, current_market = "A League Men", futures_market = "A League Men Futures", file_name = "a_league_men")
+# get_data(sport_df = sports_df, current_market = "A League Women", futures_market = "A League Women Futures", file_name = "a_league_women")
+#
+# get_data(sport_df = sports_df, current_market = "EuroLeague", futures_market = "", file_name = "euroleague_men")
 
 # get_data(current_market = "...", futures_market = "Victorian Politics", file_name = "vic_pol_futures")
 
