@@ -98,7 +98,12 @@ get_sports_market_local <- function (sport_df, competition_name)
   link_url <- sport_df %>% dplyr::filter(.data[["competitions.name"]] ==
                                          competition_name) %>% dplyr::pull(.data[["self"]]) %>%
     unlist()
-  res <- httr::GET(link_url) %>% httr::content()
+
+  headers = c(
+    `User-Agent` = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+  )
+
+  res <- httr::GET(link_url, httr::add_headers(.headers=headers)) %>% httr::content()
   aa <- res$matches
   markets_df <- data.frame()
   for (j in 1:length(aa)) {
