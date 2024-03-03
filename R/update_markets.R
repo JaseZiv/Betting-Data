@@ -199,8 +199,8 @@ get_data(sport_df = sports_df, current_market = "NBL", futures_market = "NBL Fut
 
 # get_data(current_market = "A League Men", futures_market = "A League Men Futures", file_name = "aleague_betting")
 
-# get_data(current_market = "AFL", futures_market = "AFL Futures", file_name = "afl_betting")
-# get_data(current_market = "Brownlow Medal", futures_market = "", file_name = "brownlow_betting")
+get_data(current_market = "AFL", futures_market = "AFL Futures", file_name = "afl_betting")
+get_data(current_market = "Brownlow Medal", futures_market = "", file_name = "brownlow_betting")
 
 # get_data(sport_df = sports_df, current_market = "NFL", futures_market = "NFL Futures", file_name = "nfl_futures")
 #
