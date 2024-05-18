@@ -161,7 +161,7 @@ get_data <- function(sport_df, current_market, futures_market, file_name) {
 
   scrape_date <- Sys.Date()
 
-  betting <- file_reader(file_name = file_name, "sports")
+  betting <- tryCatch(file_reader(file_name = file_name, "sports"), error = function(e) data.frame())
 
   httr::set_config(httr::use_proxy(url = Sys.getenv("PROXY_URL"),
                                    port = as.numeric(Sys.getenv("PROXY_PORT")),
@@ -199,8 +199,8 @@ get_data <- function(sport_df, current_market, futures_market, file_name) {
 
 # get_data(current_market = "A League Men", futures_market = "A League Men Futures", file_name = "aleague_betting")
 
-get_data(current_market = "AFL", futures_market = "AFL Futures", file_name = "afl_betting")
-get_data(current_market = "Brownlow Medal", futures_market = "", file_name = "brownlow_betting")
+get_data(sport_df = sports_df, current_market = "AFL", futures_market = "AFL Futures", file_name = "afl_betting")
+get_data(sport_df = sports_df, current_market = "Brownlow Medal", futures_market = "", file_name = "brownlow_betting")
 
 # get_data(sport_df = sports_df, current_market = "NFL", futures_market = "NFL Futures", file_name = "nfl_futures")
 #
