@@ -2,15 +2,15 @@ name: Scrape sports markets
 
 # At 22:01UTC daily (08:01 AEST).
 on:
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
   schedule:
     - cron: "1 22 * * *"
 
 jobs:
   update-markets-betting:
-    runs-on: macos-13
+    runs-on: macOS-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       PROXY_URL: ${{ secrets.PROXY_URL }}
